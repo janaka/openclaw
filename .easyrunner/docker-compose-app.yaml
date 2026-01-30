@@ -1,0 +1,28 @@
+name: easyrunner
+services:
+  moltbot-gateway:
+    image: localhost/moltbot:latest
+    environment:
+      - NODE_ENV=production
+      - HOME=/home/node
+      - TERM=xterm-256color
+    restart: unless-stopped
+    networks:
+      - easyrunner_proxy_network
+    labels:
+      xyz.easyrunner.appFramework: standardbackend
+      xyz.easyrunner.appIsPublic: true
+      xyz.easyrunner.appContainerInternalPort: 18789
+    volumes:
+      - moltbot_config:/home/node/.clawdbot
+      - moltbot_workspace:/home/node/clawd
+
+networks:
+  easyrunner_proxy_network:
+    name: easyrunner_proxy_network
+    external: true
+    driver: bridge
+
+volumes:
+  moltbot_config:
+  moltbot_workspace:
