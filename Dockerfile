@@ -38,10 +38,11 @@ EXPOSE 18789
 # The node:22-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
 # Create state directory structure (will be overwritten by volume mount if used)
-# Make extensions dir readable by node user to avoid permission warnings
+# Make extensions and docs dirs readable by node user to avoid permission issues
 RUN mkdir -p /home/node/.openclaw \
     && chown -R node:node /home/node/.openclaw /home/node \
-    && chmod -R a+rX /app/extensions 2>/dev/null || true
+    && chmod -R a+rX /app/extensions 2>/dev/null || true \
+    && chmod -R a+rX /app/docs 2>/dev/null || true
 
 # Copy and set up entrypoint script
 COPY --chown=node:node scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
