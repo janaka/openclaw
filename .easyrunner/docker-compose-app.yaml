@@ -13,6 +13,10 @@ services:
       # Gateway auth token - required when binding to non-loopback
       # Generate with: openssl rand -hex 32
       - CLAWDBOT_GATEWAY_TOKEN=ks£jdjk345nsoivuyh4e5%$^$sd#sdflkjdsf;#29qqYoO0XSDfasksnfao934kj6sD!
+      # Setup password - browse to /setup to configure via web wizard
+      - SETUP_PASSWORD=your-setup-password-here
+      # State directory for persistent config
+      - CLAWDBOT_STATE_DIR=/home/node/.moltbot      
     restart: unless-stopped
     networks:
       - easyrunner_proxy_network
