@@ -874,6 +874,7 @@
           "install/ansible",
           "install/nix",
           "install/docker",
+          "platforms/easyrunner",
           "railway",
           "render",
           "northflank",
