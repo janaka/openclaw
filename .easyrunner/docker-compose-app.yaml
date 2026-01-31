@@ -11,8 +11,8 @@ services:
       - HOME=/home/node
       - TERM=xterm-256color
       # Gateway token for auth - token auth allows skipping device pairing
-      # Generate a secure token with: openssl rand -hex 32
-      - OPENCLAW_GATEWAY_TOKEN=khs£$#j3S8lkakhlcpviy£$ASDfjih234%^sSSfkjfoiuz£
+      # Use only hex characters (a-f, 0-9) to avoid encoding issues
+      - OPENCLAW_GATEWAY_TOKEN=79da707a00cce6f610d7dea17e2903346294a4fc8acd2a89021f6c06400b7d31
       # State directory for persistent config
       - CLAWDBOT_STATE_DIR=/home/node/.moltbot      
     restart: unless-stopped
