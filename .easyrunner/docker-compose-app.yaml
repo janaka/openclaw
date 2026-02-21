@@ -1,8 +1,9 @@
 name: easyrunner
 services:
-  moltbot-gateway:
-    image: localhost/moltbot:latest
-    # Uses the docker-entrypoint.sh which creates minimal config on first run
+  openclaw-gateway:
+    image: localhost/openclaw:latest
+    # Uses the upstream docker-entrypoint.sh which creates minimal config on first run
+    # and starts the gateway with --bind lan. No entrypoint/command override needed.
     environment:
       - NODE_ENV=production
       - HOME=/home/node
@@ -24,10 +25,10 @@ services:
     volumes:
       # Persistent state directory - stores config, sessions, credentials
       # The :U flag tells Podman to recursively chown the volume to the container user (node, uid 1000)
-      - moltbot_state:/home/node/.openclaw:U
+      - openclaw_state:/home/node/.openclaw:U
 
 volumes:
-  moltbot_state:
+  openclaw_state:
     driver: local
 
 networks:
