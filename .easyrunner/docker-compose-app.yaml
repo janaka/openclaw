@@ -1,8 +1,37 @@
 name: easyrunner
 services:
-  moltbot-gateway:
-    image: localhost/moltbot:latest
-    # Uses the docker-entrypoint.sh which creates minimal config on first run
+  openclaw-gateway:
+    image: localhost/openclaw:latest
+    # Inline entrypoint creates minimal config on first run then starts the gateway.
+    # This allows the upstream Dockerfile to be used unmodified - no custom ENTRYPOINT needed.
+    entrypoint:
+      - /bin/sh
+      - -c
+      - |
+        set -e
+        STATE_DIR="${OPENCLAW_STATE_DIR:-/home/node/.openclaw}"
+        CONFIG_FILE="$STATE_DIR/openclaw.json"
+        mkdir -p "$STATE_DIR"
+        if [ ! -f "$CONFIG_FILE" ]; then
+          echo "Creating initial config at $CONFIG_FILE"
+          cat > "$CONFIG_FILE" << 'EOF'
+        {
+          "gateway": {
+            "mode": "local",
+            "trustedProxies": ["10.0.0.0/8", "172.16.0.0/12", "192.168.0.0/16"],
+            "controlUi": {
+              "dangerouslyDisableDeviceAuth": true
+            }
+          },
+          "plugins": {
+            "slots": {
+              "memory": "none"
+            }
+          }
+        }
+        EOF
+        fi
+        exec node openclaw.mjs gateway --allow-unconfigured --bind lan --port 18789
     environment:
       - NODE_ENV=production
       - HOME=/home/node
@@ -12,8 +41,6 @@ services:
       - OPENCLAW_GATEWAY_TOKEN=79da707a00cce6f610d7dea17e2903346294a4fc8acd2a89021f6c06400b7d31
       # State directory - must match the volume mount path
       - OPENCLAW_STATE_DIR=/home/node/.openclaw
-      # Resolve the reverse proxy IP dynamically for trustedProxies
-      - OPENCLAW_TRUSTED_PROXY_HOST=systemd-easyrunner__caddy
     restart: unless-stopped
     networks:
       - easyrunner_proxy_network
@@ -24,10 +51,10 @@ services:
     volumes:
       # Persistent state directory - stores config, sessions, credentials
       # The :U flag tells Podman to recursively chown the volume to the container user (node, uid 1000)
-      - moltbot_state:/home/node/.openclaw:U
+      - openclaw_state:/home/node/.openclaw:U
 
 volumes:
-  moltbot_state:
+  openclaw_state:
     driver: local
 
 networks:

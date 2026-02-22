@@ -51,38 +51,15 @@ RUN pnpm ui:build
 
 ENV NODE_ENV=production
 
-# Expose the gateway port
-EXPOSE 18789
-
-# Allow non-root user to write temp files during runtime/tests.
-RUN chown -R node:node /app
-
 # Security hardening: Run as non-root user
 # The node:22-bookworm image includes a 'node' user (uid 1000)
 # This reduces the attack surface by preventing container escape via root privileges
-# Create state directory structure (will be overwritten by volume mount if used)
-# Make extensions and docs dirs readable by node user to avoid permission issues
-RUN mkdir -p /home/node/.openclaw \
-    && chown -R node:node /home/node/.openclaw /home/node \
-    && chmod -R a+rX /app/extensions 2>/dev/null || true \
-    && chmod -R a+rX /app/docs 2>/dev/null || true
-
-# Copy and set up entrypoint script
-COPY --chown=node:node scripts/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
-
 USER node
 
-# Default: run the gateway server via entrypoint
-# The entrypoint script:
-# 1. Creates minimal config on first run (trustedProxies, dangerouslyDisableDeviceAuth, etc.)
-# 2. Starts the gateway with --bind lan
-# 
-# To complete setup, connect your local CLI to the remote gateway:
-#   openclaw config set gateway.mode remote
-#   openclaw config set gateway.remote.url wss://your-domain.com/ws
-#   openclaw config set gateway.remote.token YOUR_TOKEN
-#   openclaw status  # verify connection
-#   openclaw setup   # complete setup wizard
-ENTRYPOINT ["/usr/local/bin/docker-entrypoint.sh"]
-CMD []
+# Start gateway server with default config.
+# Binds to loopback (127.0.0.1) by default for security.
+#
+# For container platforms requiring external health checks:
+#   1. Set OPENCLAW_GATEWAY_TOKEN or OPENCLAW_GATEWAY_PASSWORD env var
+#   2. Override CMD: ["node","openclaw.mjs","gateway","--allow-unconfigured","--bind","lan"]
+CMD ["node", "openclaw.mjs", "gateway", "--allow-unconfigured"]
