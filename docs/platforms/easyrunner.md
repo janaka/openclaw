@@ -144,6 +144,16 @@ environment:
   - OPENAI_API_KEY=sk-...
 ```
 
+> **Security note**: Avoid committing real API keys to version control. Use variable substitution with a gitignored `.env` file instead:
+>
+> ```yaml
+> environment:
+>   - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+>   - OPENAI_API_KEY=${OPENAI_API_KEY}
+> ```
+>
+> Then store the values in a `.env` file alongside your compose file and add `.env` to `.gitignore`.
+
 Or configure through the Control UI settings panel.
 
 ## Connecting Channels
@@ -296,4 +306,4 @@ This is required when accessing through a reverse proxy.
 - [Gateway Overview](/gateway)
 - [Configuration Reference](/configuration)
 - [Channels Setup](/channels)
-- [Docker Deployment](/platforms/docker) (for non-EasyRunner Docker setups)
+- [Docker Deployment](/install/docker) (for non-EasyRunner Docker setups)
